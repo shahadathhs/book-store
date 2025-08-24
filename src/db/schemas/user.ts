@@ -2,6 +2,7 @@ import { relations } from 'drizzle-orm';
 import { pgEnum, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 import { createInsertSchema } from 'drizzle-zod';
 import z from 'zod';
+import { AdminLogsTable } from './admin-log';
 import { BookTable } from './book';
 import { OtpTable } from './otp';
 
@@ -47,6 +48,7 @@ export const UsersTable = pgTable('users', {
 export const UserRelations = relations(UsersTable, ({ many }) => ({
   books: many(BookTable),
   otps: many(OtpTable),
+  adminLogs: many(AdminLogsTable),
 }));
 
 // * Types & Schemas
