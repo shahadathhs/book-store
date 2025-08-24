@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as userService from '@/services/user.service';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import { NewUser } from '@/db/schemas/user';
 import jwt from 'jsonwebtoken';
 
