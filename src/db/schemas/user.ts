@@ -35,6 +35,15 @@ export const UsersTable = pgTable('users', {
 
 export type User = typeof UsersTable.$inferSelect;
 
+const UserRoleEnum = z.enum(UserRole.enumValues);
+export type UserRole = z.infer<typeof UserRoleEnum>;
+
+const UserStatusEnum = z.enum(UserStatus.enumValues);
+export type UserStatus = z.infer<typeof UserStatusEnum>;
+
+const UserLoginStatusEnum = z.enum(UserLoginStatus.enumValues);
+export type UserLoginStatus = z.infer<typeof UserLoginStatusEnum>;
+
 const UserBaseSchema = createInsertSchema(UsersTable);
 
 export const NewUserSchema = UserBaseSchema.pick({

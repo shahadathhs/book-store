@@ -4,8 +4,10 @@ import { BookTable } from './book';
 
 export const BookGenreTable = pgTable('books_genre', {
   id: uuid('id').primaryKey().defaultRandom(),
+  
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description').notNull(),
+  
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
