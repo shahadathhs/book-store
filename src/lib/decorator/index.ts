@@ -1,3 +1,4 @@
 export { Controller } from './controller.decorator';
-export { Get, Post, Put, Patch, Delete } from './router.decorator';
+export { HandleError } from './error.decorator';
 export { Use } from './middleware.decorator';
+export { Delete, Get, Patch, Post, Put } from './router.decorator';

@@ -7,8 +7,8 @@ import { injectable } from 'tsyringe';
 @injectable()
 @Controller('/api/posts')
 @Use((req, res, next) => {
-  console.info(`Checking for url: ${req.url}`);
-  res.status(401).json({ message: 'Authentication failed' });
+  console.info(`Checking for url: ${req.baseUrl + req.url}`);
+  // res.status(401).json({ message: 'Authentication failed' });
   next();
 })
 export class PostController {

@@ -42,16 +42,23 @@ export const createApp = () => {
   // Error handling middleware
   app.use(
     (
-      err: Error,
+      err: any,
       req: express.Request,
       res: express.Response,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       _next: express.NextFunction,
     ) => {
-      console.error(`Error for route ${req.url}:`, err.stack);
+      console.error(`Error for route ${req.method} ${req.url}:`, err);
 
-      res.status(res.statusCode || 500).json({
-        message: 'Something went wrong!',
+      // If response was already started, delegate to Express
+      if (res.headersSent) {
+        return _next(err);
+      }
+
+      // If error has its own status code, use it, otherwise default to 500
+      const status = err.statusCode || 500;
+
+      res.status(status).json({
+        message: err.message || 'Something went wrong!',
         error:
           config.get<string>(ConfigEnum.NODE_ENV) === 'development'
             ? err.stack
