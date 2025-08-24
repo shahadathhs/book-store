@@ -1,4 +1,6 @@
 import { PgColumn, PgTable } from 'drizzle-orm/pg-core';
+import { HandleError } from '../decorator/error.decorator';
+import { successResponse } from '../utils/response.util';
 import { BaseRepository } from './BaseRepository';
 import { FilterBuilder } from './FilterBuilder';
 import { FindOptions, ID, OrderDirection } from './IBaseRepository';
@@ -9,101 +11,53 @@ export abstract class BaseService<
 > {
   constructor(protected readonly repository: TRepository) {}
 
+  @HandleError()
   async findAll(options?: FindOptions) {
-    try {
-      const filter = options?.where
-        ? FilterBuilder.build(options?.where)
-        : undefined;
+    const filter = options?.where
+      ? FilterBuilder.build(options.where)
+      : undefined;
+    const result = await this.repository.findAll({
+      where: filter,
+      limit: options?.limit ?? 10,
+      offset: options?.offset ?? 0,
+      orderBy: this.transformOrderBy(options?.orderBy),
+    });
 
-      return await this.repository.findAll({
-        where: filter,
-        limit: options?.limit ?? 10,
-        offset: options?.offset ?? 0,
-        orderBy: this.transformOrderBy(options?.orderBy),
-      });
-    } catch (error) {
-      this.handleError(error);
-    }
+    return successResponse(result);
   }
 
+  @HandleError('Item not found')
   async findById(id: ID) {
-    try {
-      const item = await this.repository.findById(id);
-      if (!item) {
-        throw new Error('Item not found');
-      }
-      return item;
-    } catch (error) {
-      this.handleError(error);
-    }
+    const item = await this.repository.findById(id);
+    if (!item) throw new Error('Item not found');
+
+    return successResponse(item);
   }
 
+  @HandleError()
   async create(data: TTable['$inferInsert']) {
-    try {
-      const item = await this.repository.create(data);
-      return item;
-    } catch (error) {
-      this.handleError(error);
-    }
+    const item = await this.repository.create(data);
+    return successResponse(item, 'Item created successfully');
   }
 
+  @HandleError('Item not found')
   async update(id: ID, data: Partial<TTable['$inferInsert']>) {
-    try {
-      const item = await this.repository.update(id, data);
-      if (!item) {
-        throw new Error('Item not found');
-      }
+    const item = await this.repository.update(id, data);
+    if (!item) throw new Error('Item not found');
 
-      return item;
-    } catch (error) {
-      this.handleError(error);
-    }
+    return successResponse(item, 'Item updated successfully');
   }
 
+  @HandleError()
   async delete(id: ID) {
-    try {
-      await this.repository.delete(id);
-    } catch (error) {
-      this.handleError(error);
-    }
+    await this.repository.delete(id);
+    return successResponse({ deleted: true }, 'Item deleted successfully');
   }
 
+  @HandleError()
   async checkExists(id: ID) {
-    try {
-      const item = await this.repository.findById(id);
-      return !!item;
-    } catch (error) {
-      this.handleError(error);
-    }
-  }
-
-  // Private method: complete later
-  protected handleError(error: unknown): never {
-    console.error('Error finding by id', error);
-
-    if (error instanceof Error) {
-      throw error;
-    }
-
-    throw new Error(
-      typeof error === 'string' ? error : 'An unexpected error occurred',
-    );
-  }
-
-  protected async catchError(callback: () => Promise<unknown>) {
-    try {
-      return await callback();
-    } catch (error) {
-      console.error('Error finding by id', error);
-
-      if (error instanceof Error) {
-        throw error;
-      }
-
-      throw new Error(
-        typeof error === 'string' ? error : 'An unexpected error occurred',
-      );
-    }
+    const item = await this.repository.findById(id);
+    return successResponse(!!item);
   }
 
   protected transformOrderBy(orderBy: FindOptions['orderBy']) {
