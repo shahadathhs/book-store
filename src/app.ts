@@ -30,6 +30,7 @@ export const createApp = () => {
       err: Error,
       req: express.Request,
       res: express.Response,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       _next: express.NextFunction,
     ) => {
       console.error(`Error for route ${req.url}:`, err.stack);

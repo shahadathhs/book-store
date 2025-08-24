@@ -63,30 +63,6 @@ export const FilterRuleGroupSchema: z.ZodType<FilterRuleGroup> = z.lazy(() =>
   }),
 );
 
-/**
- * ===== FilterBuilder =====
- * Builds a SQLWrapper from a filter rule group
- *
- * @example
- * const filter = {
- *   combinator: 'and',
- *   rules: [
- *     { field: 'name', operator: '=', value: 'John' },
- *     { field: 'age', operator: '>', value: 25 },
- *     {
- *       combinator: 'or',
- *       rules: [
- *         { field: 'city', operator: '=', value: 'New York' },
- *         { field: 'city', operator: '=', value: 'Los Angeles' }
- *       ],
- *        not: false,
- *     }
- *   ],
- * };
- * const sql = FilterBuilder.build(filter);
- * // Generates: (name = 'John' AND age > 25 AND (city = 'New York' OR city = 'Los Angeles'))
- */
-
 export class FilterBuilder {
   static build(filter: FilterRuleGroup): SQLWrapper {
     return this.processRuleGroup(filter);

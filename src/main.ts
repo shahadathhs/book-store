@@ -16,7 +16,7 @@ async function main() {
 
     // Seed the  super admin
     const superAdmin = await seedSuperAdmin();
-    console.log('Super admin Seeded with email:', superAdmin.email);
+    console.info('Super admin Seeded with email:', superAdmin.email);
 
     // Start the server
     const app = createApp();
@@ -24,7 +24,7 @@ async function main() {
     server = http.createServer(app);
 
     server.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
+      console.info(`Server is running on port ${port}`);
     });
   } catch (error) {
     console.error('Failed to start the server', error);

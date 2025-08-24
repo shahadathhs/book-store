@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
 import db from '../connect';
-import { BookGenreTable, BookTable, NewBook, PublisherTable } from '../schemas';
 import { CategoryTable } from '../schemas/category';
 import { NewUser, UsersTable } from '../schemas/user';
+import { BookGenreTable, BookTable, NewBook, PublisherTable } from '../schemas';
 
 export async function seed() {
   // Create random users
@@ -27,7 +27,7 @@ export async function seed() {
     .values(categories)
     .returning();
 
-  console.log(
+  console.info(
     'Categories Seeded',
     createdCategories.map((c) => c.name),
   );
@@ -42,7 +42,7 @@ export async function seed() {
     .values(publishers)
     .returning();
 
-  console.log(
+  console.info(
     'Publishers Seeded',
     createdPublishers.map((p) => p.name),
   );
@@ -57,7 +57,7 @@ export async function seed() {
     .values(genres)
     .returning();
 
-  console.log(
+  console.info(
     'Genres Seeded',
     createdGenres.map((g) => g.name),
   );
@@ -78,10 +78,10 @@ export async function seed() {
   }
   const createdBooks = await db.insert(BookTable).values(books).returning();
 
-  console.log(
+  console.info(
     'Books Seeded',
     createdBooks.map((b) => b.title),
   );
 
-  console.log('Seeding completed successfully');
+  console.info('Seeding completed successfully');
 }

@@ -68,9 +68,10 @@ export type Book = typeof BookTable.$inferSelect;
 
 const BookBaseSchema = createInsertSchema(BookTable);
 
-export const NewBookSchema = BookBaseSchema.pick({
-  title: true,
-  summary: true,
+export const NewBookSchema = BookBaseSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export type NewBook = z.infer<typeof NewBookSchema>;

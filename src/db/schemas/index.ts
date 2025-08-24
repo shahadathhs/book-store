@@ -1,3 +1,4 @@
+export * from './admin-log';
 export * from './book';
 export * from './book-genre';
 export * from './book-publisher';
@@ -5,5 +6,6 @@ export * from './category';
 export * from './order';
 export * from './order-item';
 export * from './otp';
+export * from './payment';
 export * from './post';
 export * from './user';
