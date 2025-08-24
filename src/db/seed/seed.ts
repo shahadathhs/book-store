@@ -1,31 +1,18 @@
 import { faker } from '@faker-js/faker';
 import db from '../connect';
-import {
-  BookGenreTable,
-  BookStatus,
-  BookTable,
-  NewBook,
-  PublisherTable,
-} from '../schemas/book';
-import { NewUser, UserRole, UserStatus, UsersTable } from '../schemas/user';
 import { CategoryTable } from '../schemas/category';
+import { NewUser, UsersTable } from '../schemas/user';
+import { BookGenreTable, BookTable, NewBook, PublisherTable } from '../schemas';
 
-async function seed() {
-  // Clear existing data
-  await db.delete(BookTable);
-  await db.delete(BookGenreTable);
-  await db.delete(PublisherTable);
-  await db.delete(UsersTable);
-  await db.delete(CategoryTable);
-
-  // Create users
+export async function seed() {
+  // Create random users
   const users: NewUser[] = [];
   for (let i = 0; i < 20; i++) {
     users.push({
       name: faker.person.fullName(),
       email: faker.internet.email(),
       password: 'password123',
-      role: i === 0 ? 'admin' : 'user',
+      role: 'user',
       status: faker.helpers.arrayElement(['active', 'inactive']),
     });
   }
@@ -35,7 +22,15 @@ async function seed() {
   const categories = Array.from({ length: 5 }, () => ({
     name: faker.commerce.department(),
   }));
-  await db.insert(CategoryTable).values(categories);
+  const createdCategories = await db
+    .insert(CategoryTable)
+    .values(categories)
+    .returning();
+
+  console.info(
+    'Categories Seeded',
+    createdCategories.map((c) => c.name),
+  );
 
   // Create publishers
   const publishers = Array.from({ length: 8 }, () => ({
@@ -47,6 +42,11 @@ async function seed() {
     .values(publishers)
     .returning();
 
+  console.info(
+    'Publishers Seeded',
+    createdPublishers.map((p) => p.name),
+  );
+
   // Create book genres
   const genres = Array.from({ length: 10 }, () => ({
     name: faker.word.sample(),
@@ -56,6 +56,11 @@ async function seed() {
     .insert(BookGenreTable)
     .values(genres)
     .returning();
+
+  console.info(
+    'Genres Seeded',
+    createdGenres.map((g) => g.name),
+  );
 
   // Create books
   const books: NewBook[] = [];
@@ -71,12 +76,12 @@ async function seed() {
       publishedAt: faker.date.past(),
     });
   }
-  await db.insert(BookTable).values(books);
+  const createdBooks = await db.insert(BookTable).values(books).returning();
 
-  console.log('Seed completed successfully');
+  console.info(
+    'Books Seeded',
+    createdBooks.map((b) => b.title),
+  );
+
+  console.info('Seeding completed successfully');
 }
-
-seed().catch((error) => {
-  console.error('Seed failed:', error);
-  process.exit(1);
-});

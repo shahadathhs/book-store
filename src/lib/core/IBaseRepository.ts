@@ -33,7 +33,7 @@ export const FindOptionsSchema = z
 
 export type FindOptions = z.infer<typeof FindOptionsSchema>;
 
-export interface IBaseRepository<TTable extends PgTable & { id: SQLWrapper }> {
+export interface IBaseRepository<TTable extends PgTable & { id: PgColumn }> {
   // Queries
   findAll(options?: FindOptionsSQL): Promise<TTable['$inferSelect'][]>;
   findById(id: ID): Promise<TTable['$inferSelect'] | null>;

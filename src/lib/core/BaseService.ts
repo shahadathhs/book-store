@@ -1,11 +1,10 @@
-import { SQLWrapper } from 'drizzle-orm';
 import { PgColumn, PgTable } from 'drizzle-orm/pg-core';
 import { BaseRepository } from './BaseRepository';
-import { FindOptions, ID, OrderDirection } from './IBaseRepository';
 import { FilterBuilder } from './FilterBuilder';
+import { FindOptions, ID, OrderDirection } from './IBaseRepository';
 
 export abstract class BaseService<
-  TTable extends PgTable & { id: SQLWrapper },
+  TTable extends PgTable & { id: PgColumn },
   TRepository extends BaseRepository<TTable> = BaseRepository<TTable>,
 > {
   constructor(protected readonly repository: TRepository) {}
@@ -71,16 +70,16 @@ export abstract class BaseService<
 
   async checkExists(id: ID) {
     try {
-      await this.repository.findById(id);
-      return true;
+      const item = await this.repository.findById(id);
+      return !!item;
     } catch (error) {
-      return false;
+      this.handleError(error);
     }
   }
 
   // Private method: complete later
   protected handleError(error: unknown): never {
-    console.log('Error finding by id', error);
+    console.error('Error finding by id', error);
 
     if (error instanceof Error) {
       throw error;
@@ -95,7 +94,7 @@ export abstract class BaseService<
     try {
       return await callback();
     } catch (error) {
-      console.log('Error finding by id', error);
+      console.error('Error finding by id', error);
 
       if (error instanceof Error) {
         throw error;
@@ -119,10 +118,3 @@ export abstract class BaseService<
       }));
   }
 }
-
-/**
- * User Table: email, avatar
- * Profile: first name, last name
- *
- * Join: email, avatar, first name, last name
- */

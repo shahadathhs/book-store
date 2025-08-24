@@ -55,7 +55,7 @@ export function registerControllers(
     // Apply controller level middlewares
     if (controllerMetadata.middlewares.length > 0) {
       router.use(controllerMetadata.middlewares);
-      console.log('Controller middlewares applied');
+      console.info('Controller middlewares applied');
     }
 
     // Handle individual routes

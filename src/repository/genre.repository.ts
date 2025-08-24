@@ -1,7 +1,7 @@
 import { BaseRepository } from '@/lib/core/BaseRepository';
-import { BookGenreTable } from '@/db/schemas/book';
 import { inject, injectable } from 'tsyringe';
 import { DatabaseClientToken, IDatabaseClient } from '@/lib/db/IDatabaseClient';
+import { BookGenreTable } from '@/db/schemas';
 
 @injectable()
 export class GenreRepository extends BaseRepository<typeof BookGenreTable> {

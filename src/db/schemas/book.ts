@@ -1,5 +1,5 @@
+import { relations } from 'drizzle-orm';
 import {
-  boolean,
   integer,
   pgEnum,
   pgTable,
@@ -8,63 +8,46 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
+import { createInsertSchema } from 'drizzle-zod';
+import z from 'zod';
+import { BookGenreTable } from './book-genre';
+import { PublisherTable } from './book-publisher';
 import { UsersTable } from './user';
-import { relations } from 'drizzle-orm';
 
-export const PublisherTable = pgTable('publishers', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  name: varchar('name', { length: 255 }).notNull(),
-  description: text('description').notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
-});
-
-export type Publisher = typeof PublisherTable.$inferSelect;
-export type NewPublisher = typeof PublisherTable.$inferInsert;
-export type UpdatePublisher = Partial<NewPublisher>;
-
-export const BookGenreTable = pgTable('books_genre', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  name: varchar('name', { length: 255 }).notNull(),
-  description: text('description').notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
-});
-
-export type BookGenre = typeof BookGenreTable.$inferSelect;
-export type NewBookGenre = typeof BookGenreTable.$inferInsert;
-export type UpdateBookGenre = Partial<NewBookGenre>;
-
+// * Enums
 export const BookStatus = pgEnum('book_status', [
   'draft',
   'published',
   'archived',
 ]);
+export const BookStatusEnum = z.enum(BookStatus.enumValues);
+export type BookStatus = z.infer<typeof BookStatusEnum>;
 
+// * Table
 export const BookTable = pgTable('books', {
   id: uuid('id').primaryKey().defaultRandom(),
-  title: varchar('title', { length: 255 }).notNull(),
+
   publisher: uuid('publisher_id').references(() => PublisherTable.id, {
     onDelete: 'set null',
   }),
   author: uuid('author_id').references(() => UsersTable.id, {
     onDelete: 'cascade',
   }),
-  summary: text('summary').notNull(),
-  status: BookStatus('status').default('draft'),
-  pages: integer('pages').notNull(),
   genre: uuid('genre_id').references(() => BookGenreTable.id, {
     onDelete: 'set null',
   }),
+
+  title: varchar('title', { length: 255 }).notNull(),
+  summary: text('summary').notNull(),
+  status: BookStatus('status').default('draft'),
+  pages: integer('pages').notNull(),
+
   publishedAt: timestamp('published_at', { withTimezone: true }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
-export type Book = typeof BookTable.$inferSelect;
-export type NewBook = typeof BookTable.$inferInsert;
-export type UpdateBook = Partial<NewBook>;
-
+// * Relations
 export const BookRelations = relations(BookTable, ({ one }) => ({
   author: one(UsersTable, {
     fields: [BookTable.author],
@@ -80,10 +63,23 @@ export const BookRelations = relations(BookTable, ({ one }) => ({
   }),
 }));
 
-export const BookGenreRelations = relations(BookGenreTable, ({ many }) => ({
-  books: many(BookTable),
-}));
+// * Types & Schemas
+export type Book = typeof BookTable.$inferSelect;
 
-export const PublisherRelations = relations(PublisherTable, ({ many }) => ({
-  books: many(BookTable),
-}));
+const BookBaseSchema = createInsertSchema(BookTable);
+
+export const NewBookSchema = BookBaseSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type NewBook = z.infer<typeof NewBookSchema>;
+
+export const UpdateBookSchema = BookBaseSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type UpdateBook = z.infer<typeof UpdateBookSchema>;

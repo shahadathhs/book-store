@@ -1,13 +1,15 @@
+import { FindOptionsSchema } from '@/lib/core/IBaseRepository';
 import { Controller, Delete, Get, Post, Put, Use } from '@/lib/decorator';
 import { PostService } from '@/services/post.service';
-import { injectable } from 'tsyringe';
 import { Request, Response } from 'express';
-import { FindOptionsSchema } from '@/lib/core/IBaseRepository';
+import { injectable } from 'tsyringe';
 
 @injectable()
-@Controller('/api/v3/posts')
+@Controller('posts')
 @Use((req, res, next) => {
+  console.info(`Checking for url: ${req.url}`);
   res.status(401).json({ message: 'Authentication failed' });
+  next();
 })
 export class PostController {
   constructor(private readonly postService: PostService) {}
@@ -16,7 +18,7 @@ export class PostController {
   async getPosts(req: Request, res: Response) {
     const parsedQuery = FindOptionsSchema.safeParse(req.query);
     if (!parsedQuery.success) {
-      console.log(parsedQuery.error);
+      console.error(parsedQuery.error);
       return res.status(400).json({ message: 'Invalid query' });
     }
 

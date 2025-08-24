@@ -1,11 +1,10 @@
-import { PgTable } from 'drizzle-orm/pg-core';
-import { FindOptionsSQL, IBaseRepository, ID } from './IBaseRepository';
 import { asc, desc, eq, inArray, sql, SQLWrapper } from 'drizzle-orm';
+import { PgColumn, PgTable } from 'drizzle-orm/pg-core';
 import { IDatabaseClient } from '../db/IDatabaseClient';
+import { FindOptionsSQL, IBaseRepository, ID } from './IBaseRepository';
 
-export abstract class BaseRepository<
-  TTable extends PgTable & { id: SQLWrapper },
-> implements IBaseRepository<TTable>
+export abstract class BaseRepository<TTable extends PgTable & { id: PgColumn }>
+  implements IBaseRepository<TTable>
 {
   constructor(
     protected readonly db: IDatabaseClient,
@@ -14,7 +13,10 @@ export abstract class BaseRepository<
 
   async findAll(options?: FindOptionsSQL): Promise<TTable['$inferSelect'][]> {
     const result = await this.db.executeQuery('FindAll', async (db) => {
-      let query = db.select().from(this.table).$dynamic();
+      let query = db
+        .select()
+        .from(this.table as PgTable)
+        .$dynamic();
 
       if (options?.where) {
         query = query.where(options.where.getSQL());
@@ -46,7 +48,7 @@ export abstract class BaseRepository<
     const result = await this.db.executeQuery('FindById', async (db) => {
       const records = await db
         .select()
-        .from(this.table)
+        .from(this.table as PgTable)
         .where(eq(this.table.id, id))
         .execute();
 
@@ -60,7 +62,7 @@ export abstract class BaseRepository<
     const result = await this.db.executeQuery('FindById', async (db) => {
       const records = await db
         .select()
-        .from(this.table)
+        .from(this.table as PgTable)
         .where(where.getSQL())
         .execute();
 
@@ -85,7 +87,7 @@ export abstract class BaseRepository<
     const result = await this.db.executeQuery('Count', async (db) => {
       let query = db
         .select({ count: sql`count(*)` })
-        .from(this.table)
+        .from(this.table as PgTable)
         .$dynamic();
 
       if (where) {

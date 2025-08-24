@@ -1,27 +1,27 @@
 import 'reflect-metadata';
 
+import config from 'config';
 import express from 'express';
-import authRouter from '@/routers/auth.routes';
-import genreRouter from '@/routers/genre.routes';
-import publisherRouter from '@/routers/publishers.routes';
-import userRouter from '@/routers/user.routes';
-import bookRouter from '@/routers/book.routes';
-import { registerControllers } from './lib/core/registerControllers';
 import { PostController } from './controllers/post.controller';
+import { registerControllers } from './lib/core/registerControllers';
+import { ConfigEnum } from './lib/enum/config.enum';
 
 export const createApp = () => {
   const app = express();
 
   // Middleware
   app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
-  // Register routes
-  // app.use('/api/auth', authRouter);
-  // app.use('/api/genres', genreRouter);
-  // app.use('/api/publishers', publisherRouter);
-  // app.use('/api/users', userRouter);
-  // app.use('/api/books', bookRouter);
+  // CORS
+  app.use((_req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', '*');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    next();
+  });
 
+  // Register controllers
   registerControllers(app, [PostController]);
 
   // Error handling middleware
@@ -30,10 +30,18 @@ export const createApp = () => {
       err: Error,
       req: express.Request,
       res: express.Response,
-      next: express.NextFunction,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      _next: express.NextFunction,
     ) => {
-      console.error(err.stack);
-      res.status(500).json({ message: 'Something went wrong!' });
+      console.error(`Error for route ${req.url}:`, err.stack);
+
+      res.status(res.statusCode || 500).json({
+        message: 'Something went wrong!',
+        error:
+          config.get<string>(ConfigEnum.NODE_ENV) === 'development'
+            ? err.stack
+            : undefined,
+      });
     },
   );
 

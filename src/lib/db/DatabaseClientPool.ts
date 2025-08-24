@@ -30,13 +30,13 @@ export class DatabaseClientPool implements IDatabaseClient {
 
     await this.pool.connect();
     this.connected = true;
-    console.log('Database connected');
+    console.info('Database connected');
   }
 
   async disconnect() {
     await this.pool.end();
     this.connected = false;
-    console.log('Database disconnected');
+    console.info('Database disconnected');
   }
 
   isConnected() {
@@ -57,12 +57,12 @@ export class DatabaseClientPool implements IDatabaseClient {
       const result = await queryFn(this.client);
       const duration = performance.now() - start;
 
-      console.log(`[${label}] completed in ${duration.toFixed(2)}ms`);
+      console.info(`[${label}] completed in ${duration.toFixed(2)}ms`);
       return result;
     } catch (error) {
       const duration = performance.now() - start;
       console.error(`[${label}] failed in ${duration.toFixed(2)}ms`);
-      console.log(error);
+      console.info(error);
 
       throw new Error(`[${label}] Database query failed`);
     }
