@@ -2,17 +2,17 @@ import { singleton } from 'tsyringe';
 
 @singleton()
 export class Logger {
-	constructor() {}
+  constructor() {}
 
-	log(message: string) {
-		console.log(message);
-	}
+  log(message: string) {
+    console.log(message);
+  }
 
-	warn(message: string) {
-		console.warn(message);
-	}
+  warn(message: string) {
+    console.warn(message);
+  }
 
-	error(message: string) {
-		console.error(message);
-	}
+  error(message: string) {
+    console.error(message);
+  }
 }

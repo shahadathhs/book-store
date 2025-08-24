@@ -5,10 +5,10 @@ import { injectable } from 'tsyringe';
 
 @injectable()
 export class PublisherService extends BaseService<
-	typeof PublisherTable,
-	PublisherRepository
+  typeof PublisherTable,
+  PublisherRepository
 > {
-	constructor(repository: PublisherRepository) {
-		super(repository);
-	}
+  constructor(repository: PublisherRepository) {
+    super(repository);
+  }
 }

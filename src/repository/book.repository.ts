@@ -5,7 +5,7 @@ import { DatabaseClientToken, IDatabaseClient } from '@/lib/db/IDatabaseClient';
 
 @injectable()
 export class BookRepository extends BaseRepository<typeof BookTable> {
-	constructor(@inject(DatabaseClientToken) db: IDatabaseClient) {
-		super(db, BookTable);
-	}
+  constructor(@inject(DatabaseClientToken) db: IDatabaseClient) {
+    super(db, BookTable);
+  }
 }

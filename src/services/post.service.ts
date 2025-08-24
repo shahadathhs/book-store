@@ -5,7 +5,7 @@ import { injectable } from 'tsyringe';
 
 @injectable()
 export class PostService extends BaseService<typeof PostTable, PostRepository> {
-	constructor(repository: PostRepository) {
-		super(repository);
-	}
+  constructor(repository: PostRepository) {
+    super(repository);
+  }
 }

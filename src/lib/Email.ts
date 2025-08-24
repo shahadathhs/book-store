@@ -2,9 +2,9 @@ import { singleton } from 'tsyringe';
 
 @singleton()
 export class Email {
-	constructor() {}
+  constructor() {}
 
-	send(email: string, message: string) {
-		console.log(`Sending email to ${email}: ${message}`);
-	}
+  send(email: string, message: string) {
+    console.log(`Sending email to ${email}: ${message}`);
+  }
 }

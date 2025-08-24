@@ -5,10 +5,10 @@ import { injectable } from 'tsyringe';
 
 @injectable()
 export class GenreService extends BaseService<
-	typeof BookGenreTable,
-	GenreRepository
+  typeof BookGenreTable,
+  GenreRepository
 > {
-	constructor(repository: GenreRepository) {
-		super(repository);
-	}
+  constructor(repository: GenreRepository) {
+    super(repository);
+  }
 }
