@@ -1,7 +1,10 @@
 {
   "name": "book-store",
   "version": "0.0.1",
+  "author": "https://github.com/shahadathhs",
   "description": "",
+  "keywords": [],
+  "license": "UNLICENSED",
   "main": "src/main.ts",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/main.ts",
@@ -19,9 +22,6 @@
     "ci:fix": "pnpm run format:fix && pnpm run lint:fix",
     "ci:check": "pnpm run format && pnpm run lint && pnpm run build && pnpm run start"
   },
-  "keywords": [],
-  "author": "https://github.com/shahadathhs",
-  "license": "UNLICENSED",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "config": "^4.1.1",
