@@ -2,6 +2,7 @@ import { relations } from 'drizzle-orm';
 import { decimal, pgEnum, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { createInsertSchema } from 'drizzle-zod';
 import z from 'zod';
+import { PaymentsTable } from './payment';
 import { UsersTable } from './user';
 
 // * Enums
@@ -35,6 +36,13 @@ export const OrdersRelations = relations(OrdersTable, ({ one }) => ({
   user: one(UsersTable, {
     fields: [OrdersTable.userId],
     references: [UsersTable.id],
+  }),
+}));
+
+export const OrderPaymentRelations = relations(OrdersTable, ({ one }) => ({
+  payment: one(PaymentsTable, {
+    fields: [OrdersTable.id],
+    references: [PaymentsTable.orderId],
   }),
 }));
 
