@@ -1,11 +1,11 @@
+import { FindOptionsSchema } from '@/lib/core/IBaseRepository';
 import { Controller, Delete, Get, Post, Put, Use } from '@/lib/decorator';
 import { PostService } from '@/services/post.service';
-import { injectable } from 'tsyringe';
 import { Request, Response } from 'express';
-import { FindOptionsSchema } from '@/lib/core/IBaseRepository';
+import { injectable } from 'tsyringe';
 
 @injectable()
-@Controller('/api/v3/posts')
+@Controller('posts')
 @Use((req, res, next) => {
   res.status(401).json({ message: 'Authentication failed' });
 })

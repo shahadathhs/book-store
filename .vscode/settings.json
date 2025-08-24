@@ -29,4 +29,7 @@
   // 🔧 Prettier Config Sync
   "prettier.useEditorConfig": true,
   "prettier.resolveGlobalModules": false,
+
+  // 🔧 CSpell
+  "cSpell.words": ["tsyringe"]
 }
