@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ path: '.env' });
 
 export default {
-  port: process.env.PORT,
-  node_env: process.env.NODE_ENV,
-  database_url: process.env.DATABASE_URL,
+  PORT: process.env.PORT,
+  NODE_ENV: process.env.NODE_ENV,
+  DATABASE_URL: process.env.DATABASE_URL,
 } as const;

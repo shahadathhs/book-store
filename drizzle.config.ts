@@ -1,7 +1,7 @@
 import { defineConfig } from 'drizzle-kit';
 import config from 'config';
 
-const dbURl = config.get<string>('database_url');
+const dbURl = config.get<string>('DATABASE_URL');
 
 export default defineConfig({
   dialect: 'postgresql',

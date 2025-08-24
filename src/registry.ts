@@ -2,16 +2,18 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 import { DatabaseClientPool } from './lib/db/DatabaseClientPool';
 import { DatabaseClientToken } from './lib/db/IDatabaseClient';
+import config from 'config';
+import { ConfigEnum } from './lib/enum/config.enum';
 
 export async function registerDependencies() {
   try {
     const databaseClient = new DatabaseClientPool({
-      url: process.env.DATABASE_URL!,
+      url: config.get<string>(ConfigEnum.DATABASE_URL),
       maxConnection: 10,
       idleTimeout: 10000,
       connectionTimeout: 10000,
       maxUses: 1000,
-      ssl: process.env.NODE_ENV === 'production',
+      ssl: false,
     });
 
     container.register(DatabaseClientToken, {

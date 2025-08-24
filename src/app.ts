@@ -16,11 +16,11 @@ export const createApp = () => {
   app.use(express.json());
 
   // Register routes
-  app.use('/api/auth', authRouter);
-  app.use('/api/genres', genreRouter);
-  app.use('/api/publishers', publisherRouter);
-  app.use('/api/users', userRouter);
-  app.use('/api/books', bookRouter);
+  // app.use('/api/auth', authRouter);
+  // app.use('/api/genres', genreRouter);
+  // app.use('/api/publishers', publisherRouter);
+  // app.use('/api/users', userRouter);
+  // app.use('/api/books', bookRouter);
 
   registerControllers(app, [PostController]);
 

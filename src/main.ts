@@ -1,8 +1,11 @@
 import { createApp } from '@/app';
 import http from 'http';
 import { registerDependencies } from './registry';
+import config from 'config';
+import { ConfigEnum } from './lib/enum/config.enum';
 
-const port = process.env.PORT || 3000;
+const port = config.get<number>(ConfigEnum.PORT) || 3000;
+
 let server: http.Server;
 
 async function main() {
