@@ -5,3 +5,5 @@ export * from './category';
 export * from './otp';
 export * from './post';
 export * from './user';
+export * from './order';
+export * from './order-item';
