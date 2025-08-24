@@ -1,8 +1,9 @@
 import { createApp } from '@/app';
-import http from 'http';
-import { registerDependencies } from './registry';
 import config from 'config';
+import http from 'http';
+import { seed } from './db/seed/seed';
 import { ConfigEnum } from './lib/enum/config.enum';
+import { registerDependencies } from './registry';
 
 const port = config.get<number>(ConfigEnum.PORT) || 3000;
 
@@ -12,6 +13,10 @@ async function main() {
   try {
     // Register dependencies
     await registerDependencies();
+    
+    // Seed the database
+    await seed();
+
 
     // Start the server
     const app = createApp();

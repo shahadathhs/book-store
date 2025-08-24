@@ -42,6 +42,7 @@ export const NewUserSchema = UserBaseSchema.pick({
   email: true,
   password: true,
   role: true,
+  status: true,
 });
 
 export type NewUser = z.infer<typeof NewUserSchema>;

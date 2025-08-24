@@ -14,7 +14,7 @@ export const createApp = () => {
   app.use(express.urlencoded({ extended: true }));
 
   // CORS
-  app.use((req, res, next) => {
+  app.use((_req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', '*');
     res.setHeader('Access-Control-Allow-Headers', '*');
@@ -30,7 +30,7 @@ export const createApp = () => {
       err: Error,
       req: express.Request,
       res: express.Response,
-      next: express.NextFunction,
+      _next: express.NextFunction,
     ) => {
       console.error(`Error for route ${req.url}:`, err.stack);
 
