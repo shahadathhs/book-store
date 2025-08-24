@@ -1,6 +1,8 @@
 import { pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import { createInsertSchema } from 'drizzle-zod';
 import z from 'zod';
 
+// * Table
 export const CategoryTable = pgTable('categories', {
   id: uuid('id').primaryKey().defaultRandom(),
 
@@ -10,6 +12,20 @@ export const CategoryTable = pgTable('categories', {
   updatedAt: timestamp('updatedAt', { withTimezone: true }).defaultNow(),
 });
 
-export type Category = z.infer<typeof CategoryTable.$inferSelect>;
-export type NewCategory = z.infer<typeof CategoryTable.$inferInsert>;
-export type UpdateCategory = Partial<NewCategory>;
+// * Types & Schemas
+export type Category = typeof CategoryTable.$inferSelect;
+
+const CategoryBaseSchema = createInsertSchema(CategoryTable);
+
+export const NewCategorySchema = CategoryBaseSchema.pick({
+  name: true,
+});
+
+export type NewCategorySchema = z.infer<typeof NewCategorySchema>;
+
+export const UpdateCategorySchema = CategoryBaseSchema.pick({
+  id: true,
+  name: true,
+});
+
+export type UpdateCategorySchema = z.infer<typeof UpdateCategorySchema>;

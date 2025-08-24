@@ -6,9 +6,12 @@ import {
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core';
+import { createInsertSchema } from 'drizzle-zod';
+import z from 'zod';
 import { BookTable } from './book';
 import { OrdersTable } from './order';
 
+// * Table
 export const OrderItemsTable = pgTable('order_items', {
   id: uuid('id').primaryKey().defaultRandom(),
 
@@ -26,6 +29,7 @@ export const OrderItemsTable = pgTable('order_items', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
+// * Relations
 export const OrderItemsRelations = relations(OrderItemsTable, ({ one }) => ({
   order: one(OrdersTable, {
     fields: [OrderItemsTable.orderId],
@@ -36,3 +40,25 @@ export const OrderItemsRelations = relations(OrderItemsTable, ({ one }) => ({
     references: [BookTable.id],
   }),
 }));
+
+// * Types & Schemas
+export type OrderItem = typeof OrderItemsTable.$inferSelect;
+
+const OrderItemsBaseSchema = createInsertSchema(OrderItemsTable);
+
+export const NewOrderItemSchema = OrderItemsBaseSchema.pick({
+  orderId: true,
+  bookId: true,
+  quantity: true,
+  price: true,
+});
+
+export type NewOrderItem = z.infer<typeof NewOrderItemSchema>;
+
+export const UpdateOrderItemSchema = OrderItemsBaseSchema.pick({
+  id: true,
+  quantity: true,
+  price: true,
+});
+
+export type UpdateOrderItem = z.infer<typeof UpdateOrderItemSchema>;

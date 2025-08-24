@@ -8,17 +8,22 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
+import { createInsertSchema } from 'drizzle-zod';
 import z from 'zod';
 import { BookGenreTable } from './book-genre';
 import { PublisherTable } from './book-publisher';
 import { UsersTable } from './user';
 
+// * Enums
 export const BookStatus = pgEnum('book_status', [
   'draft',
   'published',
   'archived',
 ]);
+export const BookStatusEnum = z.enum(BookStatus.enumValues);
+export type BookStatus = z.infer<typeof BookStatusEnum>;
 
+// * Table
 export const BookTable = pgTable('books', {
   id: uuid('id').primaryKey().defaultRandom(),
 
@@ -42,10 +47,7 @@ export const BookTable = pgTable('books', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
-export type Book = z.infer<typeof BookTable.$inferSelect>;
-export type NewBook = z.infer<typeof BookTable.$inferInsert>;
-export type UpdateBook = Partial<NewBook>;
-
+// * Relations
 export const BookRelations = relations(BookTable, ({ one }) => ({
   author: one(UsersTable, {
     fields: [BookTable.author],
@@ -60,3 +62,23 @@ export const BookRelations = relations(BookTable, ({ one }) => ({
     references: [BookGenreTable.id],
   }),
 }));
+
+// * Types & Schemas
+export type Book = typeof BookTable.$inferSelect;
+
+const BookBaseSchema = createInsertSchema(BookTable);
+
+export const NewBookSchema = BookBaseSchema.pick({
+  title: true,
+  summary: true,
+});
+
+export type NewBook = z.infer<typeof NewBookSchema>;
+
+export const UpdateBookSchema = BookBaseSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type UpdateBook = z.infer<typeof UpdateBookSchema>;

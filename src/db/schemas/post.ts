@@ -10,12 +10,16 @@ import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { UsersTable } from './user';
 
+// * Enums
 export const PostStatus = pgEnum('post_status', [
   'draft',
   'published',
   'archived',
 ]);
+export const PostStatusEnum = z.enum(PostStatus.enumValues);
+export type PostStatus = z.infer<typeof PostStatusEnum>;
 
+// * Table
 export const PostTable = pgTable('posts', {
   id: uuid('id').primaryKey().defaultRandom(),
 
@@ -32,10 +36,8 @@ export const PostTable = pgTable('posts', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
+// * Types & Schemas
 export type Post = typeof PostTable.$inferSelect;
-
-const PostStatusEnum = z.enum(PostStatus.enumValues);
-export type PostStatus = z.infer<typeof PostStatusEnum>;
 
 export const NewPostSchema = createInsertSchema(PostTable).omit({
   createdAt: true,

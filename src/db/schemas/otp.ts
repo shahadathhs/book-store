@@ -10,6 +10,7 @@ import { createInsertSchema } from 'drizzle-zod';
 import z from 'zod';
 import { UsersTable } from './user';
 
+// * Table
 export const OtpTable = pgTable('otps', {
   id: uuid('id').primaryKey().defaultRandom(),
 
@@ -27,6 +28,7 @@ export const OtpTable = pgTable('otps', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
+// * Types & Schemas
 export type Otp = typeof OtpTable.$inferInsert;
 
 const OtpBaseSchema = createInsertSchema(OtpTable);

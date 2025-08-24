@@ -5,10 +5,20 @@ import z from 'zod';
 import { BookTable } from './book';
 import { OtpTable } from './otp';
 
+// * Enums
 export const UserRole = pgEnum('user_roles', ['super_admin', 'admin', 'user']);
-export const UserStatus = pgEnum('user_status', ['active', 'inactive']);
-export const UserLoginStatus = pgEnum('user_login_status', ['login', 'logout']);
+export const UserRoleEnum = z.enum(UserRole.enumValues);
+export type UserRole = z.infer<typeof UserRoleEnum>;
 
+export const UserStatus = pgEnum('user_status', ['active', 'inactive']);
+export const UserStatusEnum = z.enum(UserStatus.enumValues);
+export type UserStatus = z.infer<typeof UserStatusEnum>;
+
+export const UserLoginStatus = pgEnum('user_login_status', ['login', 'logout']);
+export const UserLoginStatusEnum = z.enum(UserLoginStatus.enumValues);
+export type UserLoginStatus = z.infer<typeof UserLoginStatusEnum>;
+
+// * Table
 export const UsersTable = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
 
@@ -33,16 +43,14 @@ export const UsersTable = pgTable('users', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
+// * Relations
+export const UserRelations = relations(UsersTable, ({ many }) => ({
+  books: many(BookTable),
+  otps: many(OtpTable),
+}));
+
+// * Types & Schemas
 export type User = typeof UsersTable.$inferSelect;
-
-const UserRoleEnum = z.enum(UserRole.enumValues);
-export type UserRole = z.infer<typeof UserRoleEnum>;
-
-const UserStatusEnum = z.enum(UserStatus.enumValues);
-export type UserStatus = z.infer<typeof UserStatusEnum>;
-
-const UserLoginStatusEnum = z.enum(UserLoginStatus.enumValues);
-export type UserLoginStatus = z.infer<typeof UserLoginStatusEnum>;
 
 const UserBaseSchema = createInsertSchema(UsersTable);
 
@@ -73,8 +81,3 @@ export const UpdateUserSchemaByAdmin = UserBaseSchema.omit({
 }).partial();
 
 export type UpdateUserByAdmin = z.infer<typeof UpdateUserSchemaByAdmin>;
-
-export const UserRelations = relations(UsersTable, ({ many }) => ({
-  books: many(BookTable),
-  otps: many(OtpTable),
-}));
