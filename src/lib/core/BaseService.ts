@@ -1,11 +1,10 @@
-import { SQLWrapper } from 'drizzle-orm';
 import { PgColumn, PgTable } from 'drizzle-orm/pg-core';
 import { BaseRepository } from './BaseRepository';
 import { FilterBuilder } from './FilterBuilder';
 import { FindOptions, ID, OrderDirection } from './IBaseRepository';
 
 export abstract class BaseService<
-  TTable extends PgTable & { id: SQLWrapper },
+  TTable extends PgTable & { id: PgColumn },
   TRepository extends BaseRepository<TTable> = BaseRepository<TTable>,
 > {
   constructor(protected readonly repository: TRepository) {}

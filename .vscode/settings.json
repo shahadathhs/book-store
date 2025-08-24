@@ -31,5 +31,5 @@
   "prettier.resolveGlobalModules": false,
 
   // 🔧 CSpell
-  "cSpell.words": ["otps", "tsyringe"]
+  "cSpell.words": ["ilike", "otps", "tsyringe"]
 }
