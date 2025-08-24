@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 
 import { Application, RequestHandler, Router } from 'express';
+import { container } from 'tsyringe';
 import {
   CONTROLLER_KEY,
   CONTROLLER_MIDDLEWARE_KEY,
@@ -8,7 +9,6 @@ import {
   ROUTE_KEY,
 } from '../decorator/decorator.keys';
 import { RouterDefinition } from '../decorator/router.decorator';
-import { container } from 'tsyringe';
 
 type Constructor = new (...args: any[]) => {};
 

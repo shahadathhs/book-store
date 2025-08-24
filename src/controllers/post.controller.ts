@@ -5,7 +5,7 @@ import { Request, Response } from 'express';
 import { injectable } from 'tsyringe';
 
 @injectable()
-@Controller('posts')
+@Controller('/api/posts')
 @Use((req, res, next) => {
   console.info(`Checking for url: ${req.url}`);
   res.status(401).json({ message: 'Authentication failed' });

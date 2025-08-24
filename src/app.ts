@@ -21,6 +21,21 @@ export const createApp = () => {
     next();
   });
 
+  // Root Route
+  app.get('/', (_req, res) => {
+    res.status(200).json({ message: 'Welcome!' });
+  });
+
+  // API Route
+  app.get('/api', (_req, res) => {
+    res.status(200).json({ message: 'This is the API endpoint!' });
+  });
+
+  // Health check
+  app.get('/health', (_req, res) => {
+    res.status(200).json({ message: 'OK' });
+  });
+
   // Register controllers
   registerControllers(app, [PostController]);
 
