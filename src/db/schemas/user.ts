@@ -1,15 +1,8 @@
-import {
-  integer,
-  pgEnum,
-  pgTable,
-  timestamp,
-  uuid,
-  varchar,
-} from 'drizzle-orm/pg-core';
-import { BookTable } from './book';
 import { relations } from 'drizzle-orm';
+import { pgEnum, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
+import { BookTable } from './book';
 
 export const UserRole = pgEnum('user_roles', ['admin', 'user']);
 export const UserStatus = pgEnum('user_status', ['active', 'inactive']);
