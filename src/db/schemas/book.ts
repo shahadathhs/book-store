@@ -1,5 +1,5 @@
+import { relations } from 'drizzle-orm';
 import {
-  boolean,
   integer,
   pgEnum,
   pgTable,
@@ -8,32 +8,9 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
+import { BookGenreTable } from './book-genre';
+import { PublisherTable } from './book-publisher';
 import { UsersTable } from './user';
-import { relations } from 'drizzle-orm';
-
-export const PublisherTable = pgTable('publishers', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  name: varchar('name', { length: 255 }).notNull(),
-  description: text('description').notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
-});
-
-export type Publisher = typeof PublisherTable.$inferSelect;
-export type NewPublisher = typeof PublisherTable.$inferInsert;
-export type UpdatePublisher = Partial<NewPublisher>;
-
-export const BookGenreTable = pgTable('books_genre', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  name: varchar('name', { length: 255 }).notNull(),
-  description: text('description').notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
-});
-
-export type BookGenre = typeof BookGenreTable.$inferSelect;
-export type NewBookGenre = typeof BookGenreTable.$inferInsert;
-export type UpdateBookGenre = Partial<NewBookGenre>;
 
 export const BookStatus = pgEnum('book_status', [
   'draft',
@@ -78,12 +55,4 @@ export const BookRelations = relations(BookTable, ({ one }) => ({
     fields: [BookTable.genre],
     references: [BookGenreTable.id],
   }),
-}));
-
-export const BookGenreRelations = relations(BookGenreTable, ({ many }) => ({
-  books: many(BookTable),
-}));
-
-export const PublisherRelations = relations(PublisherTable, ({ many }) => ({
-  books: many(BookTable),
 }));

@@ -1,20 +1,10 @@
 import { faker } from '@faker-js/faker';
 import db from '../connect';
-import {
-  BookGenreTable,
-  BookTable,
-  NewBook,
-  PublisherTable,
-} from '../schemas/book';
+import { BookGenreTable, BookTable, NewBook, PublisherTable } from '../schemas';
 import { CategoryTable } from '../schemas/category';
 import { NewUser, UsersTable } from '../schemas/user';
-import { seedSuperAdmin } from './super-admin.seed';
 
 export async function seed() {
-  // Create super admin
-  const superAdmin = await seedSuperAdmin();
-  console.log('Super admin Seeded with email:', superAdmin.email);
-
   // Create random users
   const users: NewUser[] = [];
   for (let i = 0; i < 20; i++) {
@@ -78,7 +68,7 @@ export async function seed() {
     books.push({
       title: faker.lorem.words({ min: 2, max: 5 }),
       publisher: faker.helpers.arrayElement(createdPublishers).id,
-      author: faker.helpers.arrayElement(createdUsers.concat(superAdmin)).id,
+      author: faker.helpers.arrayElement(createdUsers).id,
       summary: faker.lorem.paragraph(),
       status: faker.helpers.arrayElement(['draft', 'published', 'archived']),
       pages: faker.number.int({ min: 50, max: 1000 }),

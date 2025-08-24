@@ -1,7 +1,7 @@
 import { createApp } from '@/app';
 import config from 'config';
 import http from 'http';
-import { seed } from './db/seed/seed';
+import { seedSuperAdmin } from './db/seed/super-admin.seed';
 import { ConfigEnum } from './lib/enum/config.enum';
 import { registerDependencies } from './registry';
 
@@ -13,10 +13,10 @@ async function main() {
   try {
     // Register dependencies
     await registerDependencies();
-    
-    // Seed the database
-    await seed();
 
+    // Seed the  super admin
+    const superAdmin = await seedSuperAdmin();
+    console.log('Super admin Seeded with email:', superAdmin.email);
 
     // Start the server
     const app = createApp();
