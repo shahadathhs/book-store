@@ -2,4 +2,6 @@ export enum ConfigEnum {
   PORT = 'PORT',
   NODE_ENV = 'NODE_ENV',
   DATABASE_URL = 'DATABASE_URL',
+  JWT_SECRET = 'JWT_SECRET',
+  JWT_EXPIRES_IN = 'JWT_EXPIRES_IN',
 }
