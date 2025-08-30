@@ -20,6 +20,10 @@ export class UserService extends BaseService<
     super(repository);
   }
 
+  async getUserByIdRaw(id: string) {
+    return this.repository.findById(id);
+  }
+
   @HandleError('Failed to reset password')
   async forgetPassword(userId: string) {
     const user = await this.repository.findById(userId);

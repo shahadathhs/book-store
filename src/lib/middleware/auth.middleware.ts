@@ -1,11 +1,9 @@
 import 'reflect-metadata';
 
 import { UserRole } from '@/db/schemas';
-import config from 'config';
 import Express, { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import { AUTH_ROLE_KEY, PUBLIC_KEY } from '../decorator/decorator.keys';
-import { ConfigEnum } from '../enum/config.enum';
 import { errorResponse } from '../utils/response.util';
 
 export interface AuthRequest extends Express.Request {
@@ -16,6 +14,12 @@ export interface AuthRequest extends Express.Request {
 export type CreateAuthMiddlewareOptions<TUser = any> = {
   // function to resolve a user from an id extracted from the JWT
   getUserById: (id: string) => Promise<TUser | null>;
+
+  // JWT secret
+  jwtSecret: string;
+
+  // whether to allow missing roles
+  allowMissingRoles: boolean;
 };
 
 const tokenExtractor = (req: AuthRequest) => {
@@ -34,17 +38,9 @@ const tokenExtractor = (req: AuthRequest) => {
 export function createAuthMiddleware<TUser = any>(
   controllerPrototype: any, // controller.prototype
   methodName: string,
-  allowMissingRoles = false,
+  options: CreateAuthMiddlewareOptions<TUser>,
 ): RequestHandler {
-  const { getUserById } = controllerPrototype as {
-    getUserById: (id: string) => Promise<TUser | null>;
-  };
-
-  const jwtSecret = config.get(ConfigEnum.JWT_SECRET) as string;
-
-  if (!jwtSecret) {
-    throw new Error('JWT_SECRET is not defined');
-  }
+  const { jwtSecret, getUserById, allowMissingRoles = false } = options;
 
   return async function authMiddleware(req: AuthRequest, res, next) {
     try {

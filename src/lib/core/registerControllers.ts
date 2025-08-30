@@ -3,12 +3,18 @@ import 'reflect-metadata';
 import { Application, RequestHandler, Router } from 'express';
 import { container } from 'tsyringe';
 import {
+  AUTH_ROLE_KEY,
   CONTROLLER_KEY,
   CONTROLLER_MIDDLEWARE_KEY,
   MIDDLEWARE_KEY,
+  PUBLIC_KEY,
   ROUTE_KEY,
 } from '../decorator/decorator.keys';
 import { RouterDefinition } from '../decorator/router.decorator';
+import {
+  createAuthMiddleware,
+  CreateAuthMiddlewareOptions,
+} from '../middleware/auth.middleware';
 
 type Constructor = new (...args: any[]) => {};
 
@@ -21,16 +27,18 @@ type ControllerMetadata = {
 export function registerControllers(
   app: Application,
   controllers: Constructor[],
+  authOptions?: CreateAuthMiddlewareOptions,
 ) {
   controllers.forEach((Controller) => {
     const controllerInstance = container.resolve(Controller);
 
     const controllerMetadata: ControllerMetadata = {
       basePath: Reflect.getMetadata(CONTROLLER_KEY, Controller),
-      routes: Reflect.getMetadata(
-        ROUTE_KEY,
-        Controller.prototype,
-      ) as RouterDefinition[],
+      routes:
+        (Reflect.getMetadata(
+          ROUTE_KEY,
+          Controller.prototype,
+        ) as RouterDefinition[]) || [],
       middlewares:
         (Reflect.getMetadata(
           CONTROLLER_MIDDLEWARE_KEY,
@@ -52,10 +60,12 @@ export function registerControllers(
 
     const router = Router();
 
-    // Apply controller level middlewares
+    // Apply controller-level middlewares
     if (controllerMetadata.middlewares.length > 0) {
       router.use(controllerMetadata.middlewares);
-      console.info('Controller middlewares applied');
+      console.info(
+        `[registerControllers] Controller middlewares applied for ${Controller.name}`,
+      );
     }
 
     // Handle individual routes
@@ -67,7 +77,7 @@ export function registerControllers(
         );
       }
 
-      const middlewares =
+      const methodMiddlewares =
         Reflect.getMetadata(
           MIDDLEWARE_KEY,
           Controller.prototype,
@@ -77,7 +87,49 @@ export function registerControllers(
       const handler = (controllerInstance as any)[route.methodName].bind(
         controllerInstance,
       );
-      router[route.method](route.path, [...middlewares, handler]);
+
+      const fullMiddlewares: RequestHandler[] = [];
+
+      // ---- AUTH HANDLING ----
+      if (authOptions) {
+        const isMethodPublic =
+          Reflect.getMetadata(
+            PUBLIC_KEY,
+            Controller.prototype,
+            route.methodName,
+          ) === true;
+        const isControllerPublic =
+          Reflect.getMetadata(PUBLIC_KEY, Controller) === true;
+
+        const methodRoles: string[] | undefined = Reflect.getMetadata(
+          AUTH_ROLE_KEY,
+          Controller.prototype,
+          route.methodName,
+        );
+        const controllerRoles: string[] | undefined = Reflect.getMetadata(
+          AUTH_ROLE_KEY,
+          Controller,
+        );
+
+        const hasRoles = methodRoles || controllerRoles;
+
+        if (!isMethodPublic && !isControllerPublic && hasRoles) {
+          const authMw = createAuthMiddleware(
+            Controller.prototype,
+            route.methodName,
+            authOptions,
+          );
+          fullMiddlewares.push(authMw);
+        }
+      }
+
+      // method-level middlewares
+      if (methodMiddlewares.length > 0) {
+        fullMiddlewares.push(...methodMiddlewares);
+      }
+
+      // finally add handler
+      (router as any)[route.method](route.path, ...fullMiddlewares, handler);
     });
 
     app.use(controllerMetadata.basePath, router);

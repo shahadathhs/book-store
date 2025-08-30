@@ -2,9 +2,11 @@ import 'reflect-metadata';
 
 import config from 'config';
 import express from 'express';
+import { container } from 'tsyringe';
 import { PostController } from './controllers/post.controller';
 import { registerControllers } from './lib/core/registerControllers';
 import { ConfigEnum } from './lib/enum/config.enum';
+import { UserService } from './services/user.service';
 
 export const createApp = () => {
   const app = express();
@@ -37,7 +39,14 @@ export const createApp = () => {
   });
 
   // Register controllers
-  registerControllers(app, [PostController]);
+  registerControllers(app, [PostController], {
+    jwtSecret: config.get<string>(ConfigEnum.JWT_SECRET),
+    allowMissingRoles: true,
+    getUserById: (id: string) => {
+      const userService = container.resolve(UserService);
+      return userService.getUserByIdRaw(id);
+    },
+  });
 
   // Error handling middleware
   app.use(
