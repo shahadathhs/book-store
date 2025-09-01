@@ -7,6 +7,7 @@ import { PostController } from './controllers/post.controller';
 import { registerControllers } from './lib/core/registerControllers';
 import { ConfigEnum } from './lib/enum/config.enum';
 import { UserService } from './services/user.service';
+import { AuthController } from './controllers/auth.controller';
 
 export const createApp = () => {
   const app = express();
@@ -39,7 +40,7 @@ export const createApp = () => {
   });
 
   // Register controllers
-  registerControllers(app, [PostController], {
+  registerControllers(app, [AuthController, PostController], {
     jwtSecret: config.get<string>(ConfigEnum.JWT_SECRET),
     allowMissingRoles: true,
     getUserById: (id: string) => {
