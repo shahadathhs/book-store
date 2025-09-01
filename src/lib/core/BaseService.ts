@@ -1,5 +1,4 @@
 import { PgColumn, PgTable } from 'drizzle-orm/pg-core';
-import { HandleError } from '../decorator/error.decorator';
 import { successResponse } from '../utils/response.util';
 import { BaseRepository } from './BaseRepository';
 import { FilterBuilder } from './FilterBuilder';
@@ -11,7 +10,6 @@ export abstract class BaseService<
 > {
   constructor(protected readonly repository: TRepository) {}
 
-  @HandleError()
   async findAll(options?: FindOptions) {
     const filter = options?.where
       ? FilterBuilder.build(options.where)
@@ -26,7 +24,6 @@ export abstract class BaseService<
     return successResponse(result);
   }
 
-  @HandleError('Item not found')
   async findById(id: ID) {
     const item = await this.repository.findById(id);
     if (!item) throw new Error('Item not found');
@@ -34,13 +31,11 @@ export abstract class BaseService<
     return successResponse(item);
   }
 
-  @HandleError()
   async create(data: TTable['$inferInsert']) {
     const item = await this.repository.create(data);
     return successResponse(item, 'Item created successfully');
   }
 
-  @HandleError('Item not found')
   async update(id: ID, data: Partial<TTable['$inferInsert']>) {
     const item = await this.repository.update(id, data);
     if (!item) throw new Error('Item not found');
@@ -48,13 +43,11 @@ export abstract class BaseService<
     return successResponse(item, 'Item updated successfully');
   }
 
-  @HandleError()
   async delete(id: ID) {
     await this.repository.delete(id);
     return successResponse({ deleted: true }, 'Item deleted successfully');
   }
 
-  @HandleError()
   async checkExists(id: ID) {
     const item = await this.repository.findById(id);
     return successResponse(!!item);

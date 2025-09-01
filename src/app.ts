@@ -3,11 +3,11 @@ import 'reflect-metadata';
 import config from 'config';
 import express from 'express';
 import { container } from 'tsyringe';
+import { AuthController } from './controllers/auth.controller';
 import { PostController } from './controllers/post.controller';
 import { registerControllers } from './lib/core/registerControllers';
 import { ConfigEnum } from './lib/enum/config.enum';
 import { UserService } from './services/user.service';
-import { AuthController } from './controllers/auth.controller';
 
 export const createApp = () => {
   const app = express();

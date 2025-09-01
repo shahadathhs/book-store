@@ -15,14 +15,4 @@ export class UserService extends BaseService<
   async getUserByIdRaw(id: string) {
     return this.repository.findById(id);
   }
-
-  // async login(email: string, password: string) {
-  //   // * get user directly from db
-  //   const user = await UsersTable.findOne({
-  //     where: {
-  //       email,
-  //     },
-  //   });
-  //   return successResponse(user);
-  // }
 }
