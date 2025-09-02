@@ -29,4 +29,13 @@ export class AuthController {
 
     res.status(200).json(result);
   }
+
+  @Post('/verify-otp')
+  async verifyOtp(req: Request, res: Response) {
+    const { email, code } = req.body;
+
+    const result = await this.authService.verifyOtp(email, code);
+
+    res.status(200).json(result);
+  }
 }

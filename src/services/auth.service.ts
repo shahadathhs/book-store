@@ -1,10 +1,13 @@
 import { NewUser } from '@/db/schemas';
-import { HandleError } from '@/lib/decorator';
 import { Email } from '@/lib/Email';
+import { ConfigEnum } from '@/lib/enum/config.enum';
+import { JWTPayload } from '@/lib/middleware/auth.middleware';
 import { errorResponse, successResponse } from '@/lib/utils/response.util';
 import { UserRepository } from '@/repository/user.repository';
 import { UserService } from '@/services/user.service';
 import bcrypt from 'bcryptjs';
+import config from 'config';
+import jwt from 'jsonwebtoken';
 import { container, injectable } from 'tsyringe';
 import { OtpService } from './otp.service';
 
@@ -15,7 +18,6 @@ export class AuthService {
     private readonly otpService: OtpService,
   ) {}
 
-  @HandleError('User registration failed')
   async register(data: NewUser) {
     const { email, password, name } = data;
 
@@ -32,7 +34,6 @@ export class AuthService {
     return result;
   }
 
-  @HandleError('Failed to request OTP')
   async requestOtp(email: string, password: string) {
     const user = await this.getUserByUserEmail(email);
     if (user) {
@@ -47,6 +48,25 @@ export class AuthService {
       }
 
       return errorResponse(null, 'Invalid password');
+    }
+
+    return errorResponse(null, 'User not found');
+  }
+
+  async verifyOtp(email: string, code: string) {
+    const user = await this.getUserByUserEmail(email);
+    if (user) {
+      const isValidOtp = await this.otpService.verifyOtp(user.id, code);
+      if (isValidOtp) {
+        const tokens = await this.generateTokens({
+          sub: user.id,
+          email: user.email,
+          role: user.role as JWTPayload['role'],
+        });
+        return successResponse(tokens, 'OTP verified successfully');
+      }
+
+      return errorResponse(null, 'Invalid OTP');
     }
 
     return errorResponse(null, 'User not found');
@@ -89,5 +109,29 @@ export class AuthService {
     const user = await repo.findByEmail(email);
 
     return user;
+  }
+
+  private signToken(payload: object, secret: string, options: object) {
+    return jwt.sign(payload, secret, options);
+  }
+
+  private async generateTokens(payload: JWTPayload) {
+    const accessToken = this.signToken(
+      payload,
+      config.get(ConfigEnum.JWT_SECRET),
+      {
+        expiresIn: '2d',
+      },
+    );
+
+    const refreshToken = this.signToken(
+      payload,
+      config.get(ConfigEnum.JWT_SECRET),
+      {
+        expiresIn: '90d',
+      },
+    );
+
+    return { accessToken, refreshToken };
   }
 }

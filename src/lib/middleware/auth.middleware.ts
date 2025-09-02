@@ -6,8 +6,14 @@ import jwt from 'jsonwebtoken';
 import { AUTH_ROLE_KEY, PUBLIC_KEY } from '../decorator/decorator.keys';
 import { errorResponse } from '../utils/response.util';
 
+export type JWTPayload = {
+  sub: string;
+  role: UserRole;
+  email: string;
+};
+
 export interface AuthRequest extends Express.Request {
-  user?: any;
+  user?: JWTPayload;
   token?: string;
 }
 
@@ -86,22 +92,28 @@ export function createAuthMiddleware<TUser = any>(
             ),
           );
       }
+
+      // Attach token to request
       req.token = token;
 
       // verify JWT
-      let payload: any;
+      let payload: JWTPayload | null;
       try {
-        payload = jwt.verify(token, jwtSecret);
+        payload = jwt.verify(token, jwtSecret) as JWTPayload;
       } catch (err) {
         return res
           .status(401)
           .json(errorResponse(err, 'Invalid or expired token'));
       }
 
+      if (!payload) {
+        return res
+          .status(401)
+          .json(errorResponse(new Error('Invalid token'), 'Unauthorized'));
+      }
+
       // Expect payload to include user id. Adjust key (`sub`/`id`) to your token shape.
-      const userId = (payload.sub ?? payload.id ?? payload.userId) as
-        | string
-        | undefined;
+      const userId = payload.sub as string | undefined;
       if (!userId) {
         return res
           .status(401)
@@ -111,7 +123,7 @@ export function createAuthMiddleware<TUser = any>(
       }
 
       // fetch user with provided function
-      const user = (await getUserById(userId)) as any;
+      const user = await getUserById(userId);
       if (!user) {
         return res
           .status(401)
@@ -119,11 +131,11 @@ export function createAuthMiddleware<TUser = any>(
       }
 
       // attach user to request
-      req.user = user;
+      req.user = payload;
 
       // if roles specified, check
       if (requiredRoles && requiredRoles.length > 0) {
-        if (!requiredRoles.includes(user?.role as UserRole)) {
+        if (!requiredRoles.includes(req.user?.role as UserRole)) {
           return res
             .status(403)
             .json(errorResponse(new Error('Forbidden'), 'Insufficient role'));

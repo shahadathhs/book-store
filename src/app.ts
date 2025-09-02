@@ -68,6 +68,7 @@ export const createApp = () => {
       const status = err.statusCode || 500;
 
       res.status(status).json({
+        success: false,
         message: err.message || 'Something went wrong!',
         error:
           config.get<string>(ConfigEnum.NODE_ENV) === 'development'
