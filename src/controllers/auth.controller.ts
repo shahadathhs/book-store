@@ -1,7 +1,7 @@
 import { Controller, Post } from '@/lib/decorator';
+import { AuthService } from '@/services/auth.service';
 import { Request, Response } from 'express';
 import { injectable } from 'tsyringe';
-import { AuthService } from './../services/auth.service';
 
 @injectable()
 @Controller('/api/auth')
@@ -57,6 +57,15 @@ export class AuthController {
       code,
       newPassword,
     );
+
+    res.status(200).json(result);
+  }
+
+  @Post('/refresh')
+  async refresh(req: Request, res: Response) {
+    const { refreshToken } = req.body;
+
+    const result = await this.authService.refreshToken(refreshToken);
 
     res.status(200).json(result);
   }

@@ -130,6 +130,39 @@ export class AuthService {
     return errorResponse(null, 'User not found');
   }
 
+  async refreshToken(refreshToken: string) {
+    const payload = this.verifyToken(refreshToken);
+    if (!payload) {
+      throw new Error('Invalid refresh token');
+    }
+
+    const userRes = await this.userService.findById(payload.sub);
+    if (!userRes) {
+      throw new Error('User not found');
+    }
+
+    const user = userRes.data;
+
+    const tokens = await this.generateTokens({
+      sub: user.id,
+      email: user.email,
+      role: user.role as JWTPayload['role'],
+    });
+
+    return successResponse(
+      {
+        tokens,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        },
+      },
+      'Refresh token validated successfully',
+    );
+  }
+
   private async hashPassword(password: string) {
     const salt = await bcrypt.genSalt(10);
     return await bcrypt.hash(password, salt);
@@ -178,6 +211,15 @@ export class AuthService {
 
   private signToken(payload: object, secret: string, options: object) {
     return jwt.sign(payload, secret, options);
+  }
+
+  private verifyToken(token: string) {
+    try {
+      return jwt.verify(token, config.get(ConfigEnum.JWT_SECRET)) as JWTPayload;
+    } catch (error) {
+      console.error('Token verification failed:', error);
+      return null;
+    }
   }
 
   private async generateTokens(payload: JWTPayload) {
