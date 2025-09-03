@@ -38,4 +38,26 @@ export class AuthController {
 
     res.status(200).json(result);
   }
+
+  @Post('/forget-password')
+  async forgetPassword(req: Request, res: Response) {
+    const { email } = req.body;
+
+    const result = await this.authService.forgetPassword(email);
+
+    res.status(200).json(result);
+  }
+
+  @Post('/reset-password')
+  async resetPassword(req: Request, res: Response) {
+    const { email, code, newPassword } = req.body;
+
+    const result = await this.authService.resetPassword(
+      email,
+      code,
+      newPassword,
+    );
+
+    res.status(200).json(result);
+  }
 }

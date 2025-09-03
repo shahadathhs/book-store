@@ -1,4 +1,4 @@
-import { OtpTable } from '@/db/schemas';
+import { OtpPurpose, OtpTable } from '@/db/schemas';
 import { BaseService } from '@/lib/core/BaseService';
 import { OtpRepository } from '@/repository/otp.repository';
 import { injectable } from 'tsyringe';
@@ -10,7 +10,15 @@ export class OtpService extends BaseService<typeof OtpTable, OtpRepository> {
   }
 
   // Helper to verify OTP
-  async verifyOtp(userId: string, code: string) {
+  async verifyOtp({
+    userId,
+    code,
+    purpose,
+  }: {
+    userId: string;
+    code: string;
+    purpose: OtpPurpose;
+  }) {
     const otp = await this.repository.getOtpByIdAndCode(userId, code);
 
     if (!otp) {
@@ -27,7 +35,12 @@ export class OtpService extends BaseService<typeof OtpTable, OtpRepository> {
       throw new Error('OTP expired');
     }
 
-    // 4. Mark as used
+    // 4. Check if purpose matches
+    if (otp.purpose !== purpose) {
+      throw new Error('Invalid OTP purpose');
+    }
+
+    // 5. Mark as used
     await this.repository.markOtpAsUsed(otp.id);
 
     return otp;

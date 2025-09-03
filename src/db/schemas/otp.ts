@@ -1,6 +1,7 @@
 import { relations } from 'drizzle-orm';
 import {
   boolean,
+  pgEnum,
   pgTable,
   timestamp,
   uuid,
@@ -9,6 +10,14 @@ import {
 import { createInsertSchema } from 'drizzle-zod';
 import z from 'zod';
 import { UsersTable } from './user';
+
+// * Enums
+export const OtpPurpose = pgEnum('otp_purpose', [
+  'PASSWORD_RESET',
+  'LOGIN_VERIFICATION',
+]);
+export const OtpPurposeEnum = z.enum(OtpPurpose.enumValues);
+export type OtpPurpose = z.infer<typeof OtpPurposeEnum>;
 
 // * Table
 export const OtpTable = pgTable('otps', {
@@ -19,7 +28,7 @@ export const OtpTable = pgTable('otps', {
   }),
 
   code: varchar('code', { length: 10 }).notNull(),
-  purpose: varchar('purpose', { length: 50 }).notNull(),
+  purpose: OtpPurpose('purpose').default('LOGIN_VERIFICATION'),
 
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   used: boolean('used').default(false),

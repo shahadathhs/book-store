@@ -16,7 +16,7 @@
     "db:studio": "drizzle-kit studio",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx src/db/seed",
-    "db:reset": "tsx src/db/reset",
+    "db:reset": "drizzle-kit drop && drizzle-kit migrate && drizzle-kit push",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --ignore-path .gitignore --check \"**/*.+(js|ts|json)\"",

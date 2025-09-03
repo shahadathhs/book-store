@@ -1,4 +1,4 @@
-import { NewUser } from '@/db/schemas';
+import { NewUser, OtpPurpose } from '@/db/schemas';
 import { Email } from '@/lib/Email';
 import { ConfigEnum } from '@/lib/enum/config.enum';
 import { JWTPayload } from '@/lib/middleware/auth.middleware';
@@ -29,7 +29,11 @@ export class AuthService {
       name,
     });
 
-    await this.sendOtp(result.data.id, email);
+    await this.sendOtp({
+      userId: result.data.id,
+      email,
+      purpose: 'LOGIN_VERIFICATION',
+    });
 
     return result;
   }
@@ -42,7 +46,11 @@ export class AuthService {
         user.password,
       );
       if (isPasswordValid) {
-        await this.sendOtp(user.id, email);
+        await this.sendOtp({
+          userId: user.id,
+          email,
+          purpose: 'LOGIN_VERIFICATION',
+        });
 
         return successResponse(null, 'OTP sent successfully');
       }
@@ -56,14 +64,64 @@ export class AuthService {
   async verifyOtp(email: string, code: string) {
     const user = await this.getUserByUserEmail(email);
     if (user) {
-      const isValidOtp = await this.otpService.verifyOtp(user.id, code);
+      const isValidOtp = await this.otpService.verifyOtp({
+        userId: user.id,
+        code,
+        purpose: 'LOGIN_VERIFICATION',
+      });
       if (isValidOtp) {
         const tokens = await this.generateTokens({
           sub: user.id,
           email: user.email,
           role: user.role as JWTPayload['role'],
         });
-        return successResponse(tokens, 'OTP verified successfully');
+
+        return successResponse(
+          {
+            tokens,
+            user: {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              role: user.role,
+            },
+          },
+          'OTP verified successfully',
+        );
+      }
+
+      return errorResponse(null, 'Invalid OTP');
+    }
+
+    return errorResponse(null, 'User not found');
+  }
+
+  async forgetPassword(email: string) {
+    const user = await this.getUserByUserEmail(email);
+    if (user) {
+      await this.sendOtp({
+        userId: user.id,
+        email,
+        purpose: 'PASSWORD_RESET',
+      });
+      return successResponse(null, 'OTP sent successfully');
+    }
+
+    return errorResponse(null, 'User not found');
+  }
+
+  async resetPassword(email: string, code: string, newPassword: string) {
+    const user = await this.getUserByUserEmail(email);
+    if (user) {
+      const isValidOtp = await this.otpService.verifyOtp({
+        userId: user.id,
+        code,
+        purpose: 'PASSWORD_RESET',
+      });
+      if (isValidOtp) {
+        const hashedPassword = await this.hashPassword(newPassword);
+        await this.userService.update(user.id, { password: hashedPassword });
+        return successResponse(null, 'Password reset successfully');
       }
 
       return errorResponse(null, 'Invalid OTP');
@@ -81,10 +139,9 @@ export class AuthService {
     return bcrypt.compare(password, hashedPassword);
   }
 
-  private async otpWithExpiry(userId: string) {
+  private async otpWithExpiry(userId: string, purpose: OtpPurpose) {
     const otp = Math.floor(100000 + Math.random() * 900000);
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
-    const purpose = 'Login Verification';
 
     return {
       code: otp.toString(),
@@ -94,8 +151,16 @@ export class AuthService {
     };
   }
 
-  private async sendOtp(userId: string, email: string) {
-    const data = await this.otpWithExpiry(userId);
+  private async sendOtp({
+    userId,
+    email,
+    purpose,
+  }: {
+    userId: string;
+    email: string;
+    purpose: OtpPurpose;
+  }) {
+    const data = await this.otpWithExpiry(userId, purpose);
 
     const item = await this.otpService.create(data);
 

@@ -18,7 +18,7 @@ export class Email {
   }
 
   async sendLoginOtp(email: string, otp: string) {
-    const subject = 'Your Login OTP Code';
+    const subject = 'Your OTP Code';
     const text = `Hello,
 
 Here is your One-Time Password (OTP) to log in:
@@ -34,7 +34,7 @@ The Team
 
     const html = `
       <div style="font-family: Arial, sans-serif; color: #333;">
-        <h2 style="color: #4CAF50;">🔐 Login Verification</h2>
+        <h2 style="color: #4CAF50;">🔐 OTP Verification</h2>
         <p>Hello,</p>
         <p>Here is your One-Time Password (OTP) to log in:</p>
         <h1 style="color: #4CAF50; letter-spacing: 2px;">${otp}</h1>
@@ -54,9 +54,9 @@ The Team
         html,
       });
 
-      console.info(`Login OTP email sent: ${info.messageId}`);
+      console.info(`OTP email sent: ${info.messageId}`);
     } catch (err) {
-      console.error('Error sending login OTP email:', err);
+      console.error('Error sending OTP email:', err);
       throw err;
     }
   }
