@@ -163,6 +163,18 @@ export class AuthService {
     );
   }
 
+  async me(userId: string) {
+    const userRes = await this.userService.findById(userId);
+    if (!userRes) {
+      return errorResponse(null, 'User not found');
+    }
+
+    const user = userRes.data;
+    const userWithoutPassword = { ...user, password: undefined };
+
+    return successResponse(userWithoutPassword, 'User fetched successfully');
+  }
+
   private async hashPassword(password: string) {
     const salt = await bcrypt.genSalt(10);
     return await bcrypt.hash(password, salt);

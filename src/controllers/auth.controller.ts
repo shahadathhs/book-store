@@ -1,4 +1,6 @@
-import { Controller, Post } from '@/lib/decorator';
+import { Controller, Get, Post } from '@/lib/decorator';
+import { ValidateUser } from '@/lib/decorator/auth.decorators';
+import { AuthRequest } from '@/lib/middleware/auth.middleware';
 import { AuthService } from '@/services/auth.service';
 import { Request, Response } from 'express';
 import { injectable } from 'tsyringe';
@@ -66,6 +68,22 @@ export class AuthController {
     const { refreshToken } = req.body;
 
     const result = await this.authService.refreshToken(refreshToken);
+
+    res.status(200).json(result);
+  }
+
+  @Get('/me')
+  @ValidateUser()
+  async me(req: AuthRequest, res: Response) {
+    const userId = req?.user?.sub;
+
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ success: false, message: 'Unauthorized', data: null });
+    }
+
+    const result = await this.authService.me(userId);
 
     res.status(200).json(result);
   }

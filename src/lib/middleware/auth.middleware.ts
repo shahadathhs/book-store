@@ -32,7 +32,7 @@ const tokenExtractor = (req: AuthRequest) => {
   const auth = (req.headers?.authorization as string | undefined) || '';
   if (!auth) return null;
   const [scheme, token] = auth.split(' ');
-  if (scheme.toLowerCase() !== 'Bearer' || !token) return null;
+  if (scheme.toLowerCase() !== 'bearer' || !token) return null;
   return token;
 };
 

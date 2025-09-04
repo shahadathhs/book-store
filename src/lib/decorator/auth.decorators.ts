@@ -24,3 +24,14 @@ export function Public() {
     }
   };
 }
+export function ValidateUser() {
+  return Roles('user', 'admin', 'super_admin');
+}
+
+export function ValidateAdmin() {
+  return Roles('admin', 'super_admin');
+}
+
+export function ValidateSuperAdmin() {
+  return Roles('super_admin');
+}
