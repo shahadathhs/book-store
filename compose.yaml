@@ -1,25 +1,47 @@
 services:
   book_store_postgres:
+    container_name: book_store_postgres
     image: postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: book_store
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - book_store_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - app-network
+      - book-store-network
+
+  book_store_app:
+    container_name: book_store_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgres://postgres:postgres@book_store_postgres:5432/book_store
+    depends_on:
+      book_store_postgres:
+        condition: service_healthy
+    ports:
+      - '4000:4000'
+    networks:
+      - book-store-network
+
+    command: sh -c "pnpm db:push && pnpm run start"
 
 volumes:
   book_store_data:
 
 networks:
-  app-network:
+  book-store-network:
     driver: bridge
