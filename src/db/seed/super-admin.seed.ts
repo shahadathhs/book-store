@@ -1,3 +1,6 @@
+import { ConfigEnum } from '@/lib/enum/config.enum';
+import bcrypt from 'bcryptjs';
+import config from 'config';
 import { eq } from 'drizzle-orm';
 import db from '../connect';
 import { NewUser, UsersTable } from '../schemas/user';
@@ -13,10 +16,18 @@ export async function seedSuperAdmin() {
     return existing[0];
   }
 
+  const superAdminEmail = config.get<string>(ConfigEnum.SUPER_ADMIN_EMAIL);
+  const superAdminPassword = config.get<string>(
+    ConfigEnum.SUPER_ADMIN_PASSWORD,
+  );
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(superAdminPassword, salt);
+
   const superAdmin: NewUser = {
     name: 'Super Admin',
-    email: 'superadmin@example.com',
-    password: 'superSecurePassword', // hash this in production!
+    email: superAdminEmail,
+    password: hashedPassword,
     role: 'super_admin',
   };
 

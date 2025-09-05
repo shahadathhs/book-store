@@ -10,4 +10,6 @@ export default {
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
   GMAIL_USER: process.env.GMAIL_USER,
   GMAIL_PASS: process.env.GMAIL_PASS,
+  SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL,
+  SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD,
 } as const;
