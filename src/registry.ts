@@ -1,8 +1,9 @@
 import 'reflect-metadata';
+
+import config from 'config';
 import { container } from 'tsyringe';
 import { DatabaseClientPool } from './lib/db/DatabaseClientPool';
 import { DatabaseClientToken } from './lib/db/IDatabaseClient';
-import config from 'config';
 import { ConfigEnum } from './lib/enum/config.enum';
 
 export async function registerDependencies() {
@@ -13,7 +14,7 @@ export async function registerDependencies() {
       idleTimeout: 10000,
       connectionTimeout: 10000,
       maxUses: 1000,
-      ssl: false,
+      ssl: config.get<string>(ConfigEnum.NODE_ENV) === 'local' ? false : true, // True for production, false for local development
     });
 
     container.register(DatabaseClientToken, {
