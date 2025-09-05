@@ -19,6 +19,7 @@ services:
       - book-store-network
 
   book_store_app:
+    image: shahadathhs/book-store-server:latest
     container_name: book_store_app
     build:
       context: .
