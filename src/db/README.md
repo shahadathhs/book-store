@@ -16,6 +16,6 @@ This directory contains all database-related code and configuration for the Book
 
 ## Schemas
 
-See [Schemas Documentation](schemas/README.md) for details on all database schemas.
+See [Schemas Documentation](./Schemas.md) for details on all database schemas.
 
 > For more details, refer to the documentation in each file.
