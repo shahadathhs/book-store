@@ -27,7 +27,7 @@ services:
     env_file:
       - .env
     environment:
-      NODE_ENV: production
+      NODE_ENV: localhost
       PORT: 4000
       DATABASE_URL: postgres://postgres:postgres@book_store_postgres:5432/book_store
     depends_on:

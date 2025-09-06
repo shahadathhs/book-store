@@ -144,7 +144,7 @@ No request body required.
 
 </details>
 
-<details open>
+<details>
 <summary>Posts Endpoints (/api/post)</summary>
 
 - Work IN Progress

@@ -4,7 +4,7 @@ APP_IMAGE := shahadathhs/book-store-server:latest
 # Compose file
 COMPOSE_FILE := compose.yaml
 
-.PHONY: help build up down restart logs clean
+.PHONY: help build up down restart logs clean push
 
 # Show available commands
 help:
