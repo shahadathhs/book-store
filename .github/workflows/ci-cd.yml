@@ -69,6 +69,11 @@ jobs:
     if: github.ref == 'refs/heads/main' # Only run on main branch
 
     steps:
-      - name: Call Render Deploy Hook
+      - name: Call Render Deploy Hook for Docker Deployment
         run: |
           curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+      - name: Call Render Deploy Hook for Node JS Deployment
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_NODEJS }}
+      - name: Confirm Deployment Triggered
+        run: echo "Render deployment triggered successfully."

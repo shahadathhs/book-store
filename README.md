@@ -1,27 +1,24 @@
 # 📚 Book Store
 
-#### 🌐 [Live URL](https://book-store-fbwl.onrender.com)
+#### 🌐 Live Deployments
 
-#### 🗂 [View Database ERD](https://dbdiagram.io/d/Book-Store-68bae5a561a46d388ea5485e)
+1. [Node.js App](https://book-shop-w0xn.onrender.com/api)
+2. [Dockerized App](https://book-store-fbwl.onrender.com/api)
 
-## 📖 Description
+#### 🗂 [Database ERD](https://dbdiagram.io/d/Book-Store-68bae5a561a46d388ea5485e)
 
-Book Store is a **Nest-like Express application** designed to manage books, orders, payments, and user interactions.  
-It follows a **modular architecture** (Controllers, Services, Repositories, and Schemas) similar to NestJS while using **Express.js, TypeScript, Drizzle ORM, and PostgreSQL**.
+## 📖 Overview
 
-This project demonstrates:
+**Book Store** is a **Nest-inspired Express.js application** built to handle **books, orders, payments, and user interactions**.
 
-- 🔐 Authentication & OTP verification
-- 📚 Book and Category management
-- 🛒 Orders & Order items handling
-- 💳 Payments with statuses
-- ✍️ Posts & content publishing
-- 📝 Logging admin actions
+It follows a **modular architecture** — separating concerns into **Controllers, Services, Repositories, and Schemas** — while leveraging:
 
-## 🏗 Project Structure
+- **Express.js** for the server framework
+- **TypeScript** for type safety
+- **Drizzle ORM** for database management
+- **PostgreSQL** as the relational database
 
-- [`src/db`](src/db/README.md) → Database setup, configuration, and usage details.
-- [`src/db/schemas`](src/db/Schemas.md) → All database schemas with enums, relations, and documentation.
+This design provides a clean, maintainable, and scalable backend structure similar to NestJS while keeping the flexibility of Express.
 
 ## 🚀 Tech Stack
 
