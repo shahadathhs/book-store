@@ -15,7 +15,7 @@ export async function registerDependencies() {
       connectionTimeout: 10000,
       maxUses: 1000,
       ssl:
-        config.get<string>(ConfigEnum.NODE_ENV) === 'localhost' ? false : true, // True for production, false for localhost development
+        config.get<string>(ConfigEnum.NODE_ENV) === 'localhost' ? false : true,
     });
 
     container.register(DatabaseClientToken, {

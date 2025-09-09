@@ -1,11 +1,11 @@
+import * as schema from '@/db/schemas';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import {
   DatabaseConfig,
   DrizzleClient,
   IDatabaseClient,
 } from './IDatabaseClient';
-import * as schema from '@/db/schemas';
-import { drizzle } from 'drizzle-orm/node-postgres';
 
 export class DatabaseClientPool implements IDatabaseClient {
   private readonly pool: Pool;
@@ -19,7 +19,11 @@ export class DatabaseClientPool implements IDatabaseClient {
       idleTimeoutMillis: config.idleTimeout ?? 10000,
       connectionTimeoutMillis: config.connectionTimeout ?? 10000,
       maxUses: config.maxUses ?? 10,
-      ssl: config.ssl ?? false,
+      ssl: config.ssl
+        ? {
+            rejectUnauthorized: false,
+          }
+        : false,
     });
 
     this.client = drizzle({ client: this.pool, schema });
